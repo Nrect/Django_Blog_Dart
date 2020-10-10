@@ -59,3 +59,18 @@ class PostByTag(ListView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Записи по тегу' + str(Tag.objects.get(slug=self.kwargs['slug']))
         return context
+
+
+class Search(ListView):
+    template_name = 'blog/search.html'
+    context_object_name = 'posts'
+    paginate_by = '3'
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['sp'] = f"s={self.request.GET.get('s')}&"
+        return context
+
+    def get_queryset(self):
+        # icontains - регистронезависимый
+        return Post.objects.filter(title__icontains=self.request.GET.get('s'))
